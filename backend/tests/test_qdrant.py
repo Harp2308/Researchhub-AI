@@ -1,5 +1,5 @@
 import pytest
-from app.database.qdrant_client import get_qdrant_client, get_or_create_collection, get_db
+from app.database.qdrant_db_client import get_qdrant_client, get_or_create_collection, get_db
 from app.config.settings import get_settings
 
 settings = get_settings()

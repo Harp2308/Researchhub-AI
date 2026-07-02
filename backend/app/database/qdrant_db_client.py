@@ -1,5 +1,5 @@
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams
+from qdrant_client import models
 from app.config.settings import get_settings
 from app.utils.logger import get_logger
 
@@ -23,9 +23,9 @@ def get_or_create_collection(client: QdrantClient) -> None:
     if settings.collection_name not in names:
         client.create_collection(
             collection_name=settings.collection_name,
-            vectors_config=VectorParams(
+            vectors_config=models.VectorParams(
                 size=settings.embedding_dimensions,
-                distance=Distance.COSINE
+                distance=models.Distance.COSINE
             )
         )
         logger.info(f"Collection created: {settings.collection_name}")
