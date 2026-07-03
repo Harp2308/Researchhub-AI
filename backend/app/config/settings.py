@@ -17,9 +17,11 @@ class Settings(BaseSettings):
     groq_api_key: str
     groq_model: str = "llama-3.1-8b-instant"
 
-    # Embeddings - HuggingFace local
-    embedding_model: str = "BAAI/bge-small-en-v1.5"
-    embedding_dimensions: int = 384  # bge-small dimension
+    # Embeddings - HuggingFace api
+    hf_api_key: str =""
+    embedding_model: str = "BAAI/bge-base-en-v1.5"
+    embedding_dimensions: int = 768
+
 
     # Qdrant
     qdrant_url: str = "http://localhost:6333"
