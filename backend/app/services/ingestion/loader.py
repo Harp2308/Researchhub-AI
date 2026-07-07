@@ -1,10 +1,9 @@
 from pathlib import Path
-from langchain_community.document_loaders import PyPDFLoader, TextLoader
+from pypdf import PdfReader
 from langchain_core.documents import Document
 from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
-
 
 SUPPORTED_EXTENSIONS = {".pdf", ".txt", ".md"}
 
@@ -21,15 +20,37 @@ def load_document(file_path: str) -> list[Document]:
     logger.info(f"Loading file: {path.name} | type: {path.suffix}")
 
     if path.suffix == ".pdf":
-        loader = PyPDFLoader(str(path))
-    elif path.suffix in {".txt", ".md"}:
-        loader = TextLoader(str(path), encoding="utf-8")
-
-    docs = loader.load()
-
-    for doc in docs:
-        doc.metadata["filename"] = path.name
-        doc.metadata["source_type"] = path.suffix.replace(".", "")
+        docs = _load_pdf(path)
+    else:
+        docs = _load_text(path)
 
     logger.info(f"Loaded {len(docs)} document(s) from {path.name}")
     return docs
+
+
+def _load_pdf(path: Path) -> list[Document]:
+    reader = PdfReader(str(path))
+    docs = []
+    for i, page in enumerate(reader.pages):
+        text = page.extract_text() or ""
+        docs.append(Document(
+            page_content=text,
+            metadata={
+                "filename": path.name,
+                "source_type": "pdf",
+                "page_number": i + 1,
+            }
+        ))
+    return docs
+
+
+def _load_text(path: Path) -> list[Document]:
+    text = path.read_text(encoding="utf-8")
+    return [Document(
+        page_content=text,
+        metadata={
+            "filename": path.name,
+            "source_type": path.suffix.replace(".", ""),
+            "page_number": 1,
+        }
+    )]
